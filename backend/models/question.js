@@ -19,7 +19,7 @@ const questionSchema = new mongoose.Schema(
             required: true
         },
 
-        optionA: {
+        optionB: {
             type: String,
             required: true
         },
@@ -45,7 +45,7 @@ const questionSchema = new mongoose.Schema(
         },
 
         marks: {
-            type: String,
+            type: Number,
             required: true
         },
     },

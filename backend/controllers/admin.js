@@ -5,9 +5,37 @@ const User = require('../models/user.js');
 const createUser = async (req, res) => {
     try {
         let newUser = new User(req.body);
+        
+        newUser.totalMarks = Number(0);
+		newUser.testMarks = Number(0);
+		newUser.percentage = Number(0);
+
         await newUser.save();
+
         res.status(201).json({
             message: 'User created!'
+        });
+    } catch (error) {
+        res.status(400).json({
+            message: error.message
+        });
+    }
+};
+
+// View One User
+const viewUser = async (req, res) => {
+    try {
+        const currentUser = await User.findById(req.body.userId);
+        if (!currentUser) {
+            res.status(404).json({
+               message: 'User not found!' 
+            });
+            return;
+        }
+
+        res.status(200).json({
+            message: 'User found',
+            data: currentUser
         });
     } catch (error) {
         res.status(400).json({
@@ -63,12 +91,12 @@ const deleteUser = async (req, res) => {
         if (!currentUser) {
             res.status(404).json({
                 message: "User not found!"
-             });
-         } else {
+            });
+        } else {
              res.status(200).json({
                  message: "User deleted!"
-             });
-         }
+            });
+        }
     } catch (error) {
         res.status(400).json({
             message: error.message
@@ -79,6 +107,7 @@ const deleteUser = async (req, res) => {
 // Exporting Modules 
 module.exports = {
     createUser,
+    viewUser,
     viewAllUsers,
     updateUser,
     deleteUser
