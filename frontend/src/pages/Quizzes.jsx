@@ -5,9 +5,9 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { styled } from '@mui/system';
 import axios from 'axios';
 
-const QuizBox = styled(Box)(({theme}) => ({
-  minHeight: '55px', 
-  backgroundColor: theme.palette.secondary.main, 
+const QuizBox = styled(Box)(({ theme }) => ({
+  minHeight: '55px',
+  backgroundColor: theme.palette.secondary.main,
   borderRadius: '7px',
   marginTop: '25px',
   paddingLeft: '42px',
@@ -21,41 +21,77 @@ const QuizBox = styled(Box)(({theme}) => ({
   }
 }))
 
-const Quiz = ({data}) => {
-  return(
-    <QuizBox>
-      <Grid container spacing={1}>
-        <Grid item xs={4} sx={{display: 'flex', justifyContent: 'left', alignItems: 'center'}}>
-          <Typography>
-            {data.name}
-          </Typography>
-        </Grid>
-        <Grid item xs={2} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-          <Typography>
-            {data.duration} mins
-          </Typography>
-        </Grid>
-        <Grid item xs={2} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-          <Typography>
-            {data.totalQuestions} Q
-          </Typography>
-        </Grid>
-        <Grid item xs={2} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-          <Typography>
-            Reschedule
-          </Typography>
-        </Grid>
-        <Grid item xs={2} sx={{display: 'flex', justifyContent: 'right', alignItems: 'center'}}>
-          <Typography>
-            due @ {data.time}
-          </Typography>
-        </Grid>
-      </Grid>
-    </QuizBox>
+const Quiz = ({ data }) => {
+  let navigate = useNavigate()
+  const viewTest = (id) => {
+    navigate(`/viewresults`, { state: { id: id } })
+  }
+  return (
+    <>
+      {data.status === 'COMPLETED' ?
+        <QuizBox onClick={() => viewTest(data._id)}>
+          <Grid container spacing={1}>
+            <Grid item xs={4} sx={{ display: 'flex', justifyContent: 'left', alignItems: 'center' }}>
+              <Typography>
+                {data.name}
+              </Typography>
+            </Grid>
+            <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <Typography>
+                {data.duration} mins
+              </Typography>
+            </Grid>
+            <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <Typography>
+                {data.totalQuestions} Q
+              </Typography>
+            </Grid>
+            <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <Typography>
+                Reschedule
+              </Typography>
+            </Grid>
+            <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'right', alignItems: 'center' }}>
+              <Typography>
+                due @ {data.time}
+              </Typography>
+            </Grid>
+          </Grid>
+        </QuizBox> : <QuizBox>
+          <Grid container spacing={1}>
+            <Grid item xs={4} sx={{ display: 'flex', justifyContent: 'left', alignItems: 'center' }}>
+              <Typography>
+                {data.name}
+              </Typography>
+            </Grid>
+            <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <Typography>
+                {data.duration} mins
+              </Typography>
+            </Grid>
+            <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <Typography>
+                {data.totalQuestions} Q
+              </Typography>
+            </Grid>
+            <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <Typography>
+                Reschedule
+              </Typography>
+            </Grid>
+            <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'right', alignItems: 'center' }}>
+              <Typography>
+                due @ {data.time}
+              </Typography>
+            </Grid>
+          </Grid>
+        </QuizBox>
+      }
+    </>
   )
 }
 
-const StyledButton = styled(Button)(({theme}) => ({
+const StyledButton = styled(Button)(({ theme }) => ({
   paddingLeft: '23px',
   paddingRight: '23px',
   backgroundColor: theme.palette.primary.main,
@@ -72,7 +108,7 @@ const StyledTabs = styled(TabList)({
   },
 });
 
-const StyledTab = styled(Tab)(({theme}) => ({
+const StyledTab = styled(Tab)(({ theme }) => ({
   textTransform: 'none',
   fontSize: '20px',
   lineHeight: '25px',
@@ -86,23 +122,20 @@ const StyledTab = styled(Tab)(({theme}) => ({
 }))
 
 export const Quizzes = () => {
+
   const navigate = useNavigate()
   const [value, setValue] = useState('Assigned');
   const [data, setData] = useState([])
   const token = localStorage.getItem('token')
-  console.log(token);
   useEffect(() => {
     axios
-      .get('http://audioquorum.herokuapp.com/api/test/view/All/', {
+      .get('http://audioquorum-api.herokuapp.com/api/test/view/All/', {
         headers: {
           'Authentication': token
         }
       })
       .then(response => setData(response.data.data))
   }, [])
-  console.log('====================================');
-  console.log(data);
-  console.log('====================================');
   return (
     <Box>
       <Box sx={{ paddingX: '96px', paddingY: '10px', marginBottom: '144px' }}>
@@ -113,16 +146,16 @@ export const Quizzes = () => {
               <StyledTab label="Completed" value="Completed" />
             </StyledTabs>
           </Box>
-          <TabPanel value="Assigned" sx={{paddingX: '0px', paddingY: '10px'}}>
+          <TabPanel value="Assigned" sx={{ paddingX: '0px', paddingY: '10px' }}>
             {data && data.filter(x => x.status === "UPCOMING").map(x => <Quiz key={x._id} data={x} />)}
           </TabPanel>
-          <TabPanel value="Completed" sx={{padding: '0px', paddingY: '10px'}}>
-          {data && data.filter(x => x.status === "COMPLETED").map(x => <Quiz key={x._id} data={x} />)}
+          <TabPanel value="Completed" sx={{ padding: '0px', paddingY: '10px' }}>
+            {data && data.filter(x => x.status === "COMPLETED").map(x => <Quiz key={x._id} data={x} />)}
           </TabPanel>
         </TabContext>
       </Box>
-      <Box sx={{position: 'fixed', bottom: 0, width: '100%', zIndex: 12, backgroundColor: 'rgba(255, 255, 255, 0.6)'}}>
-        <Box sx={{padding: '47px', display: 'flex', justifyContent: 'space-between'}}>
+      <Box sx={{ position: 'fixed', bottom: 0, width: '100%', zIndex: 12, backgroundColor: 'rgba(255, 255, 255, 0.6)' }}>
+        <Box sx={{ padding: '47px', display: 'flex', justifyContent: 'space-between' }}>
           <StyledButton>
             Schedule Quiz
           </StyledButton>
